@@ -1,0 +1,53 @@
+-- Topic - Condition + String matching + logical operator).
+-- 1	Give me list of Customers whose First Name starts with N Or they Live in city xyz.  
+--  (Return me Customer Id, First name, Last Name, City) 
+SELECT CustomerId, FirstName, LastName, City 
+FROM customers
+WHERE FirstName LIKE "N%" OR City = "Delhi";
+ 
+-- 2	Give me list of Tracks where unit prize range between x and y and whose composer name does not contain 'T' 
+-- (Return me Track Id, Name, Composer, Unit Price) (2 Marks)
+SELECT TrackId, name, Composer, UnitPrice
+FROM tracks
+WHERE UnitPrice BETWEEN 0 AND 1
+	AND Composer NOT LIKE "%T%";
+
+-- Topic - Group By, Order By 
+-- 1	Calculate the sum of total Invoice bill and average of total Invoice bill for each day of month (June 2020). 
+-- Return me Invoice Date, Sum of Total bill for that day, Average of Total Bill for that day)
+SELECT DATE(InvoiceDate), SUM(Total) as Total_bill, AVG(Total) as Average_total_bill
+FROM invoices
+WHERE STRFTIME('%m', InvoiceDate) = '06'
+GROUP BY DATE(InvoiceDate);
+
+-- 2	Total Quantity of Each Track ID purchased so far. Sort the Track IDs in Descending order of it’s total Count 
+-- Return me Track ID and its total Quantity) 
+-- CHECK IT
+SELECT tracks.TrackId, SUM(Quantity) AS TotalQuantity
+FROM tracks
+JOIN invoice_items ON tracks.TrackId = invoice_items.TrackId
+GROUP BY tracks.TrackId
+ORDER BY TotalQuantity DESC;
+
+--  Topic - Join/Subqueries
+-- 1	Give me list of Artist IDs,  whose none of the tracks are present in any Playlist. 
+-- (Return Artist IDs and their names)
+SELECT A.ArtistId, A.Name
+FROM artists A
+LEFT JOIN albums Al ON A.ArtistId = Al.ArtistId
+LEFT JOIN tracks T ON Al.AlbumId = T.AlbumId
+LEFT JOIN playlist_track PT ON T.TrackId = PT.TrackId
+WHERE PT.TrackId IS	 NULL;
+
+-- 2	Give me a list of Album ID whose Tracks are present in more than 10 playlist
+-- (Return me Album ID, it's Title and the count of playlists wherein it's tracks are present) {Use Join Statement}  (5 Marks)
+SELECT Al.AlbumId, Al.Title, COUNT(PT.PlaylistId) AS PlaylistCount
+FROM albums Al
+JOIN tracks T ON Al.AlbumId = T.AlbumId
+JOIN playlist_track PT ON T.TrackId = PT.TrackId
+GROUP BY Al.AlbumId, Al.Title
+HAVING COUNT(PT.PlaylistId) > 10;
+
+
+
+
